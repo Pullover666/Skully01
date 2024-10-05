@@ -156,30 +156,10 @@ float smoothness_pts = 1000;//larger=slower change in brightness
 
 void flickerPWM()
 {
-  // // for (int ii=0;ii<smoothness_pts;ii++){
-  // //   Serial.println("PIRLeft.analog = "+String(analogRead(PIR_LEFT)));
-  // //   float pwm_val = 255.0*(1.0 -  abs((2.0*(ii/smoothness_pts))-1.0));
-  // //   analogWrite(LED,int(pwm_val));
-  // //   delay(5);
-  // // }
-
-  // float fadeUpTime = smoothness_pts/2;
-
-  // for (int ii=0;ii<fadeUpTime;ii++){
-  //   float pwm_val = 255.0*(1.0 -  abs((2.0*(ii/smoothness_pts))-1.0));
-  //   analogWrite(LED,int(pwm_val));
-  //   delay(2 - (ii/fadeUpTime));
-  // }
-
-  // for (int ii=fadeUpTime;ii<smoothness_pts;ii++){
-  //   float pwm_val = 255.0*(1.0 -  abs((2.0*(ii/smoothness_pts))-1.0));
-  //   analogWrite(LED,int(pwm_val));
-  //   delay(5 + ((ii-fadeUpTime)/fadeUpTime) * 10);
-  // }
-
   int steps = 25;
   int currentSteps = steps;
 
+  // glow up
   for (int ii=0;ii<smoothness_pts;ii++){
     if(currentSteps)
     {
@@ -192,6 +172,25 @@ void flickerPWM()
     delay(2);
   }
 
+  // flicker fast
+  for (int ii=0;ii<50;ii++){
+    digitalWrite(LED,255);
+    delay(20);
+    digitalWrite(LED,0);
+    delay(20);
+  }
+  digitalWrite(LED,255);
+
+  // flicker slow
+  for (int ii=0;ii<7;ii++){
+    digitalWrite(LED,255);
+    delay(400);
+    digitalWrite(LED,0);
+    delay(400);
+  }
+  digitalWrite(LED,255);
+
+  // glow down
   for (int ii=0;ii<smoothness_pts;ii++){
     float pwm_val = 255.0 - 255.0*(ii/smoothness_pts);
     analogWrite(LED,int(pwm_val));
@@ -199,41 +198,18 @@ void flickerPWM()
   }
 }
 
-void flickerLeft()
-{
-  Serial.println("flickering red eyes for 2 second");
-
-  for(int i=0;i<1;i++)
-  {
-    digitalWrite(LED, HIGH);
-    delay(200);
-    digitalWrite(LED, LOW);
-    delay(200);
-  }
-}
-
 void loop()
 {
   printSetupInfo();
 
-  // bool PIRLeft = checkPIRLeft();
-
-  // // if(PIRLeft)
-  // //   flickerLeft();
-
   bool PIR = checkPIR();
   
-  //if(PIRLeft || PIR)
   if(PIR)
   {
-    //Serial.println("PIRLeft = "+String(PIRLeft));
     Serial.println("PIR = "+String(PIR));
     flickerPWM();
     delay(2000);
   }
-
-  // // if(!m_wifi.connect())
-  // //   return;
 
   delay(200);
 }
